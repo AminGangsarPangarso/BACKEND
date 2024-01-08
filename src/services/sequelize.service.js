@@ -21,6 +21,7 @@ const initialFirstUser = async () => {
             raw_password: process.env.DEFAULT_USER_PASSWORD,
             email: process.env.DEFAULT_USER_EMAIL,
             phone_number: process.env.DEFAULT_USER_PHONE_NUMBER,
+            role: 'admin',
         });
     }
 }

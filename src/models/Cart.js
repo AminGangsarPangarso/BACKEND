@@ -3,7 +3,7 @@ import { User } from './User'
 import { Product } from './Product'
 
 class Cart extends Model {
-    static order = 4;
+    static order = 3;
     static init(sequelize) {
         super.init(
             {
@@ -12,6 +12,7 @@ class Cart extends Model {
                     allowNull: false,
                     unique: true,
                     primaryKey: true,
+                    autoIncrement: true,
                 },
                 user_id: {
                     type: Sequelize.INTEGER,
@@ -22,7 +23,7 @@ class Cart extends Model {
                     },
                 },
                 product_id: {
-                    type: Sequelize.STRING,
+                    type: Sequelize.INTEGER,
                     allowNull: false,
                     references: {
                         model: Product,

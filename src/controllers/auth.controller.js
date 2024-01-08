@@ -16,13 +16,22 @@ const authController = {
                 password: Yup.string().required(),
             });
 
-            if (!(await schema.isValid(req.body))) throw new ValidationError();
+            await schema.validate(req.body).catch((res) => {
+                throw new ValidationError(res.message);
+            });
+
             const { username, password } = req.body;
             const user = await User.findOne({ where: { username } });
-            if (!user) throw new UnauthorizedError('Wrong username or password');
-            if (!(await user.checkPassword(password))) throw new UnauthorizedError('Wrong username or password');
-            const token = JwtService.jwtSign(user.id);
-            return ApiResponse(res, 200, "Login successful", {
+            if (!user) throw new UnauthorizedError('wrong username or password');
+            if (!(await user.checkPassword(password))) throw new UnauthorizedError('wrong username or password');
+            const token = JwtService.jwtSign({
+                id: user.id,
+                username: user.username,
+                email: user.email,
+                phone_number: user.phone_number,
+                role: user.role,
+            });
+            return ApiResponse(res, 200, "login successful", {
                 username: user.username,
                 phone_number: user.phone_number,
                 token: token
@@ -37,10 +46,13 @@ const authController = {
                 username: Yup.string().required(),
                 password: Yup.string().required(),
                 email: Yup.string().email().required(),
-                phone_number: Yup.string().matches(/^62\d{8,13}$/gm, 'Invalid phone number'),
+                phone_number: Yup.string().matches(/^62\d{8,13}$/gm, 'invalid phone number'),
             });
 
-            if (!(await schema.isValid(req.body))) throw new ValidationError();
+            await schema.validate(req.body).catch((res) => {
+                throw new ValidationError(res.message);
+            });
+
             const { username, password, email, phone_number } = req.body;
             const user = await User.findOne({
                 where: {
@@ -48,9 +60,9 @@ const authController = {
                 }
             });
             if (user) {
-                if (user.username === username) throw new BadRequestError('Username already exists');
-                if (user.email === email) throw new BadRequestError('Email already exists');
-                throw new BadRequestError('Username or Email already exists');
+                if (user.username === username) throw new BadRequestError('username already exists');
+                if (user.email === email) throw new BadRequestError('email already exists');
+                throw new BadRequestError('username or Email already exists');
             }
             const newUser = await User.create({
                 username,
@@ -59,7 +71,7 @@ const authController = {
                 phone_number: phone_number,
             });
             const token = JwtService.jwtSign(user.id);
-            return ApiResponse(res, 200, "Register successful", {
+            return ApiResponse(res, 200, "register successful", {
                 username: newUser.username,
                 phone_number: newUser.phone_number,
                 token: token

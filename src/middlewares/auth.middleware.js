@@ -1,15 +1,19 @@
 import JwtService from "../services/jwt.service";
-import { BadTokenError } from "../utils/apiError"
+import { BadTokenError, ForbiddenError } from "../utils/apiError"
 
-const authMiddleware = async (req, res, next) => {
+const authMiddleware = (role = 'customer') => async (req, res, next) => {
 	try {
 		const token = JwtService.jwtGetToken(req);
 		const user = JwtService.jwtVerify(token);
 		req.user = user;
-		return next();
 	} catch (error) {
-		next(new BadTokenError())
+		return next(new BadTokenError())
 	}
+
+	if (!req?.user) return next(new BadTokenError())
+	const userRole = req.user.role;
+	if (role !== userRole && userRole !== 'admin') return next(new ForbiddenError())
+	return next();
 };
 
 export default authMiddleware;

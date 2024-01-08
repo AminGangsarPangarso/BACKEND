@@ -36,7 +36,7 @@ const expressService = {
                 })
             );
             server.use(express.urlencoded({ extended: true }));
-            server.use(express.static(`${__dirname}/public`));
+            server.use(express.static(`${__dirname}/../public`));
             server.use(routes);
             server.use(globalErrorHandler);
 

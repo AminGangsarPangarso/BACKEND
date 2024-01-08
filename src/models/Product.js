@@ -6,20 +6,24 @@ class Product extends Model {
         super.init(
             {
                 id: {
-                    type: Sequelize.STRING,
+                    type: Sequelize.INTEGER,
                     allowNull: false,
-                    unique: true,
                     primaryKey: true,
+                    autoIncrement: true,
                 },
-                product_name: {
+                name: {
                     type: Sequelize.STRING,
                     allowNull: false,
                 },
-                product_price: {
+                image: {
+                    type: Sequelize.STRING,
+                    allowNull: false,
+                },
+                price: {
                     type: Sequelize.INTEGER,
                     allowNull: false,
                 },
-                product_description: {
+                description: {
                     type: Sequelize.TEXT,
                     allowNull: false,
                 },

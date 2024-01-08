@@ -24,6 +24,11 @@ class User extends Model {
                     unique: true,
                 },
                 phone_number: Sequelize.STRING,
+                role: {
+                    type: Sequelize.ENUM('admin', 'customer'),
+                    allowNull: false,
+                    defaultValue: 'customer',
+                },
                 raw_password: Sequelize.VIRTUAL,
             },
             {
