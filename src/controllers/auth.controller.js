@@ -7,6 +7,7 @@ import {
     ValidationError,
 } from "../utils/apiError";
 import { ApiResponse } from "../utils/apiResponse";
+import { Op } from "sequelize";
 
 const authController = {
     login: async (req, res, next) => {
@@ -59,18 +60,28 @@ const authController = {
                     [Op.or]: [{ username }, { email }]
                 }
             });
+
             if (user) {
                 if (user.username === username) throw new BadRequestError('username already exists');
                 if (user.email === email) throw new BadRequestError('email already exists');
                 throw new BadRequestError('username or Email already exists');
             }
+
             const newUser = await User.create({
                 username,
                 raw_password: password,
                 email: email,
                 phone_number: phone_number,
             });
-            const token = JwtService.jwtSign(user.id);
+
+            const token = JwtService.jwtSign({
+                id: newUser.id,
+                username: newUser.newUsername,
+                email: newUser.email,
+                phone_number: newUser.phone_number,
+                role: newUser.role,
+            });
+
             return ApiResponse(res, 200, "register successful", {
                 username: newUser.username,
                 phone_number: newUser.phone_number,
