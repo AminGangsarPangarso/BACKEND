@@ -1,13 +1,10 @@
 import * as Yup from "yup";
 import Product from "../models/Product";
 import {
-    BadRequestError,
     NotFoundError,
-    UnauthorizedError,
     ValidationError,
 } from "../utils/apiError";
 import { ApiResponse } from "../utils/apiResponse";
-import fs from "fs"
 import { removeImage, removeImageFullPath } from "../utils/upload";
 
 const productController = {
@@ -25,7 +22,6 @@ const productController = {
 
             return ApiResponse(res, 200, "success get all product", product);
         } catch (error) {
-            console.log("error: ", error)
             next(error);
         }
     },
