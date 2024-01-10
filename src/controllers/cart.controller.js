@@ -82,6 +82,72 @@ const cartController = {
             next(error);
         }
     },
+    history: async (req, res, next) => {
+        try {
+            const getCart = await Cart.findAll({
+                where: {
+                    user_id: req.user.id,
+                },
+                attributes: {
+                    exclude: ['user_id']
+                },
+                include: [
+                    {
+                        model: CartProduct,
+                        as: 'cart_product',
+                        attributes: ['quantity', 'price'],
+                        include: [
+                            {
+                                model: Product,
+                                as: 'product',
+                                attributes: ['id', 'name', 'price', 'image'],
+                            }
+                        ]
+                    },
+                ],
+            });
+
+            const mappedCart = getCart.map(({
+                id,
+                price,
+                state,
+                created_at,
+                updated_at,
+                cart_product,
+            }) => {
+                const products = cart_product.map(({ product, quantity, price: sub_total }) => {
+                    const {
+                        id,
+                        name,
+                        price,
+                        image,
+                    } = product
+
+                    return {
+                        id,
+                        name,
+                        price,
+                        image,
+                        quantity,
+                        sub_total
+                    }
+                })
+
+                return {
+                    id,
+                    price,
+                    state,
+                    created_at,
+                    updated_at,
+                    products,
+                }
+            });
+
+            return ApiResponse(res, 200, "success get history", mappedCart);
+        } catch (error) {
+            next(error);
+        }
+    },
 };
 
 export default cartController;
